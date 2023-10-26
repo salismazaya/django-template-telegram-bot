@@ -1,8 +1,6 @@
 from django.apps import AppConfig
 from django.conf import settings
-from asgiref.sync import async_to_sync, sync_to_async
-import os, glob, threading, asyncio
-from telegram import Update
+import os, glob
 
 class BotConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
@@ -21,21 +19,3 @@ class BotConfig(AppConfig):
             __import__('bot.views.' + module)
         
         import bot.app
-
-        async def start():
-            await bot.app.app.initialize()
-            offset = 0
-            while True:
-                await asyncio.sleep(0.5)
-                updates = await bot.app.app.bot.get_updates(offset = offset)
-                if not updates:
-                    return
-                
-                last_update: Update = updates[-1]
-                offset = last_update.update_id
-                print(await asyncio.gather(*[bot.app.app.process_update(update) for update in updates]))
-                await bot.app.app.update_persistence()
-
-        t = threading.Thread(target = async_to_sync(start))
-        t.setDaemon(True)
-        t.start()
