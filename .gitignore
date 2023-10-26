@@ -1,0 +1,5 @@
+\.env
+Env
+db.sqlite3
+__pycache__
+tes.py
